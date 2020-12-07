@@ -1,0 +1,40 @@
+﻿
+<!-- TODO:: Move this Javascript to it's own file -->
+<script>
+    function ViewSet()
+    {
+        location.href = "@Url.Action("ViewSet")";
+    }
+</script>
+
+@{
+    ViewData["Title"] = "Explore";
+
+    var setList = ViewData["SetList"] as List<PokemonTcgSdk.Models.SetData>;
+}
+
+<h1>Explore</h1>
+<h2>Sets </h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Logo</th>
+            <th>Set Name</th>
+            <th>Year</th>
+            <th>Num Cards</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var set in setList)
+        {
+            <!--<tr onclick="ViewSet()">-->
+            <tr  onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = set.PtcgoCode })'">
+                <td class="w-25"><img class="img-thumbnail img-fluid" src="@set.LogoUrl" /></td>
+                <td>@set.Name</td>
+                <td>@set.ReleaseDate</td>
+                <td>@set.TotalCards</td>
+            </tr>
+        }
+    </tbody>
+    </table>

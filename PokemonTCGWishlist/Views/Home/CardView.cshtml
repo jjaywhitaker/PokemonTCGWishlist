@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Card Result";
+}
+
+@model PokemonTcgSdk.Models.BaseCard 
+
+<div class="text-center">
+    <h1 class="display-4">@Model.Number  @Model.Name</h1>
+    <img href="@Model.ImageUrl"/>
+</div>

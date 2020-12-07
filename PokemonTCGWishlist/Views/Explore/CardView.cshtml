@@ -1,0 +1,8 @@
+﻿
+@{
+    var card = ViewData["CurrCard"] as PokemonTcgSdk.Models.PokemonCard;
+}
+
+<h1>@card.Name</h1>
+
+<img src="@card.ImageUrlHiRes" class="w-50"/>

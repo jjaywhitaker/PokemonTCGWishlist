@@ -1,0 +1,44 @@
+﻿@{
+
+
+    var currSet = ViewData["CurrSet"] as PokemonTcgSdk.Models.SetData;
+
+    var cardList = ViewData["CardList"] as List<PokemonTcgSdk.Models.PokemonCard>;
+
+    var currSort = ViewData["CurrSort"] as string;
+
+}
+
+@model PokemonTCGWishlist.Controllers.ExploreController;
+
+
+<h1>@currSet.Name   @currSet.Code</h1>
+<a asp-action="ResultView" asp-route-sortOrder="SetNumber" asp-route-setCode="@currSet.PtcgoCode">Set Number</a>
+<a asp-action="ResultView" asp-route-sortOrder="Name" asp-route-setCode="@currSet.PtcgoCode">Name</a>
+<a asp-action="ResultView" asp-route-sortOrder="PokedexNumber" asp-route-setCode="@currSet.PtcgoCode">Pokedex Number</a>
+
+<input type="radio" value="pokemon" name="pokemonFilter" />Pokemon
+<br />
+<input type="radio" value="trainer" name="trainerFilter" />Trainer
+<br />
+<input type="radio" value="energy" name="energyFilter" />Energy
+<br />
+<!--GOING TO NEED TO USE URL.ACTION (like in Index.cshtml) TO PASS THE RADIO BUTTON VALUES THROUGH THE URL -->
+<br />
+
+<a asp-action="ResultView" asp-route-sortOrder="@currSort" asp-route-setCode="@currSet.PtcgoCode" asp-route-typeFilters=" ">Apply Filter</a>
+
+<!--Radio buttons to filter search Include Pokémon, Trainer cards, and energy cards-->
+<ol>
+    @foreach (var card in cardList)
+    {
+        <li class="w-25">
+            <img src="@card.ImageUrl" onclick="location.href = '@Url.Action("CardView","Explore", new {id = card.Id })'" />
+        </li>
+    }
+</ol>
+
+
+<script>
+
+</script>
