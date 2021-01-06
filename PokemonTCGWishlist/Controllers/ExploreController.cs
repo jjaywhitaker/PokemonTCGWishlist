@@ -24,7 +24,9 @@ namespace PokemonTCGWishlist.Controllers
         public List<PokemonCard> currentSetCardList { get; set; }
         public PokemonCard currCard { get; set; }
         public SortOption currSort { get; set; }
-        public bool pokeFilter = true;
+        public bool showPokemon { get; set; }
+        public bool showTrainer { get; set; }
+        public bool showEnergy { get; set; }
 
         public ExploreController(ILogger<ExploreController> logger)
         {
@@ -34,10 +36,16 @@ namespace PokemonTCGWishlist.Controllers
             //var b = Card.Get(new Dictionary<string, string>() { { "name", "Pikachu" } }); //returns 100 
             setList = Sets.All();
             currSort = SortOption.SetNumber;
+            showPokemon = true;
+            showTrainer = true;
+            showEnergy = true;
 
         }
 
-
+        /// <summary>
+        /// Called when viewing the SetList results 
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             //add search bar 
@@ -47,24 +55,48 @@ namespace PokemonTCGWishlist.Controllers
             
         }
 
-        public IActionResult ResultView(string setCode, string sortOrder = "SetNumber", string typeFilters = "pokemon,trainer,energy")
+        /// <summary>
+        /// Called when viewing any sort of list of cards. ex all cards in a set, all pikachu cards, all fire type cards etc 
+        /// </summary>
+        /// <param name="setCode"> The setCode of the current set.</param>
+        /// <param name="sortOrder"> What value cards should be sorted on </param>
+        /// <param name="typeFilters"> String of types for which cards should be desplayed (by SuperType ex.) Pokemon, Trainer, Energy)</param>
+        /// <returns></returns>
+        public IActionResult ResultView(string setCode, string typeFilters, string sortOrder = "SetNumber", string searchText = null)
         {
+            //TODO:: only make api calls when needed(check if anything changed)
+
             //get setData based on setCode passed in 
             var tempList = Sets.Find(new Dictionary<string, string>() { { "ptcgoCode", setCode } });
-            currSet = tempList.Count != 0 ? tempList.First() : null;
+             currSet = tempList.Count != 0 ? tempList.First() : null;
             ViewData["CurrSet"] = currSet;
 
             //get list of cards for the current set
-            currentSetCardList = Card.All(new Dictionary<string, string>() { { "setCode", currSet.Code } });
+            var query = new Dictionary<string, string>() { { "setCode", currSet.Code } };
+            if(!string.IsNullOrWhiteSpace(searchText))
+            {
+                query.Add("name", searchText);
+            }
+            currentSetCardList = Card.All(query);
 
+            if (string.IsNullOrWhiteSpace(typeFilters))
+            {
+                typeFilters = GetTypeFilters();
+            }
+            else
+            {
+                //filter cards then sort
+                showPokemon = typeFilters.Contains("pokemon");
+                showTrainer = typeFilters.Contains("trainer");
+                showEnergy = typeFilters.Contains("energy");
+            }
 
-            //filter cards then sort
-            bool showPokemon = typeFilters.Contains("pokemon");
-            bool showTrainers = typeFilters.Contains("trainer");
-            bool showEnergy = typeFilters.Contains("energy");
+            ViewData["ShowPokemon"] = showPokemon;
+            ViewData["ShowTrainer"] = showTrainer;
+            ViewData["ShowEnergy"] = showEnergy;
             if (!showPokemon)
                 currentSetCardList = currentSetCardList.FindAll(x => x.SuperType != "Pokémon");
-            if (!showTrainers)
+            if (!showTrainer)
                 currentSetCardList = currentSetCardList.FindAll(x => x.SuperType != "Trainer");
             if (!showEnergy)
                 currentSetCardList = currentSetCardList.FindAll(x => x.SuperType != "Energy");
@@ -118,6 +150,13 @@ namespace PokemonTCGWishlist.Controllers
                     
             }
         }
+
+        private string GetTypeFilters()
+        {
+            return (showPokemon ? "pokemon" : string.Empty)
+                + (showTrainer ? "trainer" : string.Empty)
+                + (showEnergy ? "energy" : string.Empty);
+        }
     }
 }
 
@@ -127,8 +166,8 @@ public enum SortOption
     SetNumber,
     Name,
     PokedexNumber,
-    Type,
-    Rarity
+    Type, //not implemented 
+    Rarity //not implemented
 }
 
 

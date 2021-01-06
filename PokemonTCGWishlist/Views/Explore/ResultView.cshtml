@@ -7,38 +7,64 @@
 
     var currSort = ViewData["CurrSort"] as string;
 
+    //https://stackoverflow.com/questions/22715067/set-selected-radio-button-asp-net-mvc-4-razer
+
+
+    var showPokemon = ViewData["ShowPokemon"] as bool?;
+    var showTrainer = ViewData["ShowTrainer"] as bool?;
+    var showEnergy = ViewData["ShowEnergy"] as bool?;
+
 }
 
-@model PokemonTCGWishlist.Controllers.ExploreController;
-
-
 <h1>@currSet.Name   @currSet.Code</h1>
-<a asp-action="ResultView" asp-route-sortOrder="SetNumber" asp-route-setCode="@currSet.PtcgoCode">Set Number</a>
-<a asp-action="ResultView" asp-route-sortOrder="Name" asp-route-setCode="@currSet.PtcgoCode">Name</a>
-<a asp-action="ResultView" asp-route-sortOrder="PokedexNumber" asp-route-setCode="@currSet.PtcgoCode">Pokedex Number</a>
+@*Need to highlight the current sort order*@
+<a onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = "SetNumber" })&typeFilters=' + getFilter()">Set Number</a>
+<a onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = "Name" })&typeFilters=' + getFilter()">Name</a>
+<a onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = "PokedexNumber" })&typeFilters=' + getFilter()">Pokedex Number</a>
+<br />
+<input type="checkbox" value="pokemon" id="pokemonFilter" @if (showPokemon == true) { <text> checked="checked" </text> } />Pokemon
+<br />
+<input type="checkbox" value="trainer" id="trainerFilter" @if (showTrainer == true) { <text> checked="checked" </text> } />Trainer
+<br />
+<input type="checkbox" value="energy" id="energyFilter" @if (showEnergy == true) { <text> checked="checked" </text> } />Energy
+<br />
+<br />
+<a onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = currSort })&typeFilters=' + getFilter()">Apply Filter</a>
 
-<input type="radio" value="pokemon" name="pokemonFilter" />Pokemon
 <br />
-<input type="radio" value="trainer" name="trainerFilter" />Trainer
 <br />
-<input type="radio" value="energy" name="energyFilter" />Energy
-<br />
-<!--GOING TO NEED TO USE URL.ACTION (like in Index.cshtml) TO PASS THE RADIO BUTTON VALUES THROUGH THE URL -->
-<br />
+<input type="text" id="searchBox" />
+<input type="button" value="Search" id="searchButton" onclick="location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = currSort })&typeFilters=' + getFilter() + '&searchText=' + getSearchValue()" />
 
-<a asp-action="ResultView" asp-route-sortOrder="@currSort" asp-route-setCode="@currSet.PtcgoCode" asp-route-typeFilters=" ">Apply Filter</a>
-
-<!--Radio buttons to filter search Include Pokémon, Trainer cards, and energy cards-->
-<ol>
+@*Need Message for when 0 results are returned*@
+<ul>
     @foreach (var card in cardList)
     {
         <li class="w-25">
             <img src="@card.ImageUrl" onclick="location.href = '@Url.Action("CardView","Explore", new {id = card.Id })'" />
         </li>
     }
-</ol>
+</ul>
 
 
 <script>
+
+    function getFilter() {
+        var pokeFilterElem = document.getElementById("pokemonFilter");
+        var trainerFilterElem = document.getElementById("trainerFilter");
+        var energyFilterElem = document.getElementById("energyFilter");
+        var filter = pokeFilterElem.checked ? pokeFilterElem.value : "";
+        filter = filter.concat(trainerFilterElem.checked ? trainerFilterElem.value : "");
+        filter = filter.concat(energyFilterElem.checked ? energyFilterElem.value : "");
+        console.log(filter);
+        return filter;
+        location.href = '@Url.Action("ResultView","Explore", new {setCode = currSet.PtcgoCode, sortOrder = currSort })&typeFilters=' + filter;
+    }
+
+    function getSearchValue() {
+        var searchValue = document.getElementById("searchBox").value;
+        console.log("SearchValue: " + searchValue);
+        return searchValue;
+    }
 
 </script>
