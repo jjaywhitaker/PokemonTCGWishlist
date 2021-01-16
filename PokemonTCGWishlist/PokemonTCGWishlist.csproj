@@ -18,8 +18,4 @@
     <PackageReference Include="PokemonTcgSdk" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Identity\Data\" />
-  </ItemGroup>
-
 </Project>
