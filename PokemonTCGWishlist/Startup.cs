@@ -35,6 +35,15 @@ namespace PokemonTCGWishlist
             services.AddIdentity<PokemonTCGWishlistUser, IdentityRole>()
                 .AddEntityFrameworkStores<PokemonTCGWishlistContext>().AddDefaultTokenProviders();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireUppercase = false;
+            }); 
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
